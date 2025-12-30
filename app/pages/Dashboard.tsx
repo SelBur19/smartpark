@@ -141,6 +141,38 @@ const DashboardPage = () => {
     </div>
   );
 
+    const renderSuperAdminContent = () => (
+      //TODO: Superadmin view
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <Card className="p-6 bg-card border-border hover:shadow-xl hover:shadow-yellow-500/10 transition-all">
+        <div className="flex items-center gap-3 mb-4">
+          <Building className="h-8 w-8 text-yellow-500" />
+          <h3 className="text-xl font-semibold text-yellow-500">My Properties</h3>
+        </div>
+        <p className="text-3xl font-bold text-yellow-500 mb-2">8</p>
+        <p className="text-foreground/70">Total parking lots</p>
+      </Card>
+
+      <Card className="p-6 bg-card border-border hover:shadow-xl hover:shadow-yellow-500/10 transition-all">
+        <div className="flex items-center gap-3 mb-4">
+          <BarChart3 className="h-8 w-8 text-yellow-500" />
+          <h3 className="text-xl font-semibold text-yellow-500">Monthly Revenue</h3>
+        </div>
+        <p className="text-3xl font-bold text-yellow-500 mb-2">$3,450</p>
+        <p className="text-foreground/70">+15% from last month</p>
+      </Card>
+
+      <Card className="p-6 bg-card border-border hover:shadow-xl hover:shadow-yellow-500/10 transition-all">
+        <div className="flex items-center gap-3 mb-4">
+          <Car className="h-8 w-8 text-yellow-500" />
+          <h3 className="text-xl font-semibold text-yellow-500">Total Bookings</h3>
+        </div>
+        <p className="text-3xl font-bold text-yellow-500 mb-2">127</p>
+        <p className="text-foreground/70">This month</p>
+      </Card>
+    </div>
+  );
+
   const renderProfile = () => (
     <Card className="p-6 bg-card border-border hover:shadow-xl hover:shadow-yellow-500/10 transition-all">
       <div className="flex items-center gap-4 mb-6">
@@ -189,6 +221,8 @@ const DashboardPage = () => {
         return renderUserContent();
       case "Owner":
         return renderOwnerContent();
+      case "SuperAdmin":
+        return renderSuperAdminContent();
       default:
         return null;
     }
