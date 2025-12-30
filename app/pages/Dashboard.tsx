@@ -147,7 +147,7 @@ const DashboardPage = () => {
       <Card className="p-6 bg-card border-border hover:shadow-xl hover:shadow-yellow-500/10 transition-all">
         <div className="flex items-center gap-3 mb-4">
           <Building className="h-8 w-8 text-yellow-500" />
-          <h3 className="text-xl font-semibold text-yellow-500">My Properties</h3>
+          <h3 className="text-xl font-semibold text-yellow-500">Dispatcher's Accounts</h3>
         </div>
         <p className="text-3xl font-bold text-yellow-500 mb-2">8</p>
         <p className="text-foreground/70">Total parking lots</p>
@@ -156,7 +156,7 @@ const DashboardPage = () => {
       <Card className="p-6 bg-card border-border hover:shadow-xl hover:shadow-yellow-500/10 transition-all">
         <div className="flex items-center gap-3 mb-4">
           <BarChart3 className="h-8 w-8 text-yellow-500" />
-          <h3 className="text-xl font-semibold text-yellow-500">Monthly Revenue</h3>
+          <h3 className="text-xl font-semibold text-yellow-500">Total Users</h3>
         </div>
         <p className="text-3xl font-bold text-yellow-500 mb-2">$3,450</p>
         <p className="text-foreground/70">+15% from last month</p>
