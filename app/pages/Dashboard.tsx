@@ -10,6 +10,9 @@ import { User as UserIcon, BarChart3, Settings, Users, Building, Car, MapPin } f
 import { useDashboard } from "@/dashboard/presentation/useDashboard";
 import { User } from "@/dashboard/domain/entities/User";
 
+
+
+
 const DashboardPage = () => {
   const [user, setUser] = useState<User | null>(null);
   const [activeTab, setActiveTab] = useState("profile");
@@ -27,28 +30,79 @@ const DashboardPage = () => {
 
   if (!user) return null;
 
-  const renderAdminContent = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <Card className="p-6 bg-card border-border hover:shadow-xl hover:shadow-yellow-500/10 transition-all">
-        <div className="flex items-center gap-3 mb-4">
-          <Users className="h-8 w-8 text-yellow-500" />
-          <h3 className="text-xl font-semibold text-yellow-500">Total Users</h3>
-        </div>
-        <p className="text-3xl font-bold text-yellow-500 mb-2">1,247</p>
-        <p className="text-foreground/70">+12% from last month</p>
-      </Card>
+const renderAdminContent = () => (
+  <div className="space-y-10">
 
-      <Card className="p-6 bg-card border-border hover:shadow-xl hover:shadow-yellow-500/10 transition-all">
-        <div className="flex items-center gap-3 mb-4">
-          <Building className="h-8 w-8 text-yellow-500" />
-          <h3 className="text-xl font-semibold text-yellow-500">Parking Lots</h3>
-        </div>
-        <p className="text-3xl font-bold text-yellow-500 mb-2">45</p>
-        <p className="text-foreground/70">3 new this month</p>
-      </Card>
+    {/* First 4 Buttons */}
+    <div>
+      <h2 className="text-lg font-semibold mb-4">Admin</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Button 
+        onClick={() => router.push("/dashboard/presentation/users")}
+        className="bg-yellow-500 text-white hover:bg-yellow-600">
+          View All Users
+        </Button>
+
+        <Button 
+        onClick={() => router.push("/dashboard/presentation/users")}
+        className="bg-yellow-500 text-white hover:bg-yellow-600">
+          Registered Cars
+        </Button>
+
+        <Button 
+        onClick={() => router.push("/dashboard/presentation/users")}
+        className="bg-yellow-500 text-white hover:bg-yellow-600">
+          Sessions
+        </Button>
+
+        <Button 
+        onClick={() => router.push("/dashboard/presentation/users")}
+        className="bg-yellow-500 text-white hover:bg-yellow-600">
+          All Parkplaces
+        </Button>
+      </div>
     </div>
-  );
 
+    {/* Next 2 Buttons */}
+    <div>
+      <h2 className="text-lg font-semibold mb-4">Owner</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Button 
+        onClick={() => router.push("/dashboard/presentation/users")}
+        className="bg-yellow-500 text-white hover:bg-yellow-600">
+          Session
+        </Button>
+
+        <Button 
+        onClick={() => router.push("/dashboard/presentation/users")}
+        className="bg-yellow-500 text-white hover:bg-yellow-600">
+          Parkplace
+        </Button>
+      </div>
+    </div>
+
+    {/* Last 2 Buttons */}
+    <div>
+      <h2 className="text-lg font-semibold mb-4">User</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Button 
+        onClick={() => router.push("/dashboard/presentation/users")}
+        className="bg-yellow-500 text-white hover:bg-yellow-600">
+          Session
+        </Button>
+
+        <Button 
+        onClick={() => router.push("/dashboard/presentation/users")}
+        className="bg-yellow-500 text-white hover:bg-yellow-600">
+          Cars
+        </Button>
+      </div>
+    </div>
+
+  </div>
+);
+
+  
   const renderUserContent = () => (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -111,33 +165,37 @@ const DashboardPage = () => {
   );
 
   const renderOwnerContent = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <Card className="p-6 bg-card border-border hover:shadow-xl hover:shadow-yellow-500/10 transition-all">
-        <div className="flex items-center gap-3 mb-4">
-          <Building className="h-8 w-8 text-yellow-500" />
-          <h3 className="text-xl font-semibold text-yellow-500">My Properties</h3>
-        </div>
-        <p className="text-3xl font-bold text-yellow-500 mb-2">8</p>
-        <p className="text-foreground/70">Total parking lots</p>
-      </Card>
+      <div>
+      <h2 className="text-lg font-semibold mb-4">Owner</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Button 
+        onClick={() => router.push("/dashboard/presentation/users")}
+        className="bg-yellow-500 text-white hover:bg-yellow-600">
+          Session
+        </Button>
 
-      <Card className="p-6 bg-card border-border hover:shadow-xl hover:shadow-yellow-500/10 transition-all">
-        <div className="flex items-center gap-3 mb-4">
-          <BarChart3 className="h-8 w-8 text-yellow-500" />
-          <h3 className="text-xl font-semibold text-yellow-500">Monthly Revenue</h3>
-        </div>
-        <p className="text-3xl font-bold text-yellow-500 mb-2">$3,450</p>
-        <p className="text-foreground/70">+15% from last month</p>
-      </Card>
+        <Button 
+        onClick={() => router.push("/dashboard/presentation/users")}
+        className="bg-yellow-500 text-white hover:bg-yellow-600">
+          Parkplace
+        </Button>
+      </div>
+       <div>
+      <h2 className="text-lg font-semibold mb-4">User</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Button 
+        onClick={() => router.push("/dashboard/presentation/users")}
+        className="bg-yellow-500 text-white hover:bg-yellow-600">
+          Session
+        </Button>
 
-      <Card className="p-6 bg-card border-border hover:shadow-xl hover:shadow-yellow-500/10 transition-all">
-        <div className="flex items-center gap-3 mb-4">
-          <Car className="h-8 w-8 text-yellow-500" />
-          <h3 className="text-xl font-semibold text-yellow-500">Total Bookings</h3>
-        </div>
-        <p className="text-3xl font-bold text-yellow-500 mb-2">127</p>
-        <p className="text-foreground/70">This month</p>
-      </Card>
+        <Button 
+        onClick={() => router.push("/dashboard/presentation/users")}
+        className="bg-yellow-500 text-white hover:bg-yellow-600">
+          Cars
+        </Button>
+      </div>
+    </div>
     </div>
   );
 

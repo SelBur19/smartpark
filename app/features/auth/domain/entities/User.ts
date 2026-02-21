@@ -5,4 +5,6 @@ export class User {
     public name?: string,
     public role?: string
   ) {}
-}
+
+};
+

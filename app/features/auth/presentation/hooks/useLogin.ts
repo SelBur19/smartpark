@@ -23,11 +23,11 @@ export const useLogin = () => {
       localStorage.setItem("user", JSON.stringify(result.user));
 
       // Store token separately if backend returns it
-      const token = (window as any).LOGIN_RESPONSE?.token ?? "";
-      if (token) localStorage.setItem("token", token);
+      //const token = (window as any).LOGIN_RESPONSE?.token ?? "";
+      localStorage.setItem("token", result.token);
 
       setMessage("Login successful ✓");
-      setTimeout(() => router.push("/dashboard"), 1000);
+      setTimeout(() => router.push("/dashboard/presentation"), 1000);
     } else {
       setMessage(result.message);
     }

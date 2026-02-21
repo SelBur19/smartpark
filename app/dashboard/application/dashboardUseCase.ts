@@ -7,3 +7,5 @@ export const getDashboardData = async (
 ): Promise<{ parkingSpots: ParkingSpot[]; bookings: Booking[] }> => {
   return repository.fetchDashboardData();
 };
+
+
