@@ -89,17 +89,25 @@ ${colorConfig
 
 const ChartTooltip = RechartsPrimitive.Tooltip;
 
-const ChartTooltipContent = React.forwardRef<
-  HTMLDivElement,
-  React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
-    React.ComponentProps<"div"> & {
-      hideLabel?: boolean;
-      hideIndicator?: boolean;
-      indicator?: "line" | "dot" | "dashed";
-      nameKey?: string;
-      labelKey?: string;
-    }
->(
+// A custom tooltip content component needs access to the props that the
+// `Tooltip` component passes to its content renderer.  `TooltipProps` (the
+// props of `<Tooltip />`) purposely omit several values (`payload`, `active`,
+// etc.) because they are read from context internally.  Those missing fields
+// are present on `TooltipContentProps`, which is the shape we actually use
+// inside our content component below.  Previously we were intersecting
+// `ComponentProps<typeof RechartsPrimitive.Tooltip>` and then destructuring
+// `payload`, which caused a TS error during the Next.js build.
+
+type ChartTooltipContentProps = RechartsPrimitive.TooltipContentProps<any, any> &
+  React.ComponentProps<"div"> & {
+    hideLabel?: boolean;
+    hideIndicator?: boolean;
+    indicator?: "line" | "dot" | "dashed";
+    nameKey?: string;
+    labelKey?: string;
+  };
+
+const ChartTooltipContent = React.forwardRef<HTMLDivElement, ChartTooltipContentProps>(
   (
     {
       active,
