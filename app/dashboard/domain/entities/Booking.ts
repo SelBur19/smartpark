@@ -1,3 +1,4 @@
+
 export class Booking {
   constructor(
     public id: number,

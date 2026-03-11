@@ -6,13 +6,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
-type User = {
-  id: number;
-  name: string;
-  email: string;
-  role: string;
-};
+import { User } from "@/dashboard/domain/entities/User";
 
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -21,35 +15,52 @@ export default function UsersPage() {
   const router = useRouter();
 
   useEffect(() => {
-    //const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-    //const token = localStorage.getItem("token");
-    const token = "AAD9A5019233771C68DCD2764D4CA08869FCE3B30627664B9DCFE87ACEA6E454";
- ;
-    /*if (!token) {
-      router.push("/login");
-      return;
-    }*/
+    const fetchUsers = async () => {
+      const storedUser = localStorage.getItem("user");
 
-    const formData = new URLSearchParams();
-    formData.append("token", token);
+      if (!storedUser) {
+        router.push("/login");
+        return;
+      }
 
-    fetch("http://smartpark.htl-projekt.com/api_getUsers.php", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: formData.toString(),
-    })
-      .then((res) => res.json())
-      .then((data) => {
+      const parsedUser = JSON.parse(storedUser);
+      const token = parsedUser?.token;
+
+      if (!token) {
+        router.push("/login");
+        return;
+      }
+
+      try {
+        const formData = new URLSearchParams();
+        formData.append("token", token);
+
+        const response = await fetch(
+          "http://smartpark.htl-projekt.com/api_getUsers.php",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: formData.toString(),
+          }
+        );
+
+        const data = await response.json();
+
         if (data.status === "success") {
           setUsers(data.data);
         } else {
           setError(data.message);
         }
-      })
-      .catch(() => setError("Failed to load users"))
-      .finally(() => setLoading(false));
+      } catch (err) {
+        setError("Failed to load users");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
   }, [router]);
 
   return (

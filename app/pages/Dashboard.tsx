@@ -106,60 +106,18 @@ const renderAdminContent = () => (
   const renderUserContent = () => (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="p-6 bg-card border-border hover:shadow-xl hover:shadow-yellow-500/10 transition-all">
-          <div className="flex items-center gap-3 mb-4">
-            <MapPin className="h-8 w-8 text-yellow-500" />
-            <h3 className="text-xl font-semibold text-yellow-500">Available Parking</h3>
-          </div>
-          <div className="space-y-3">
-            {parkingSpots.map((spot) => (
-              <div
-                key={spot.id}
-                className="flex justify-between items-center p-3 bg-yellow-50 dark:bg-yellow-900/10 rounded-lg"
-              >
-                <div>
-                  <p className="font-medium text-yellow-700 dark:text-yellow-400">{spot.location}</p>
-                  <p className="text-sm text-foreground/70">{spot.price}</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold text-yellow-500">
-                    {spot.available}/{spot.total}
-                  </p>
-                  <p className="text-sm text-foreground/70">available</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
+            <Button 
+        onClick={() => router.push("/dashboard/presentation/users")}
+        className="bg-yellow-500 text-white hover:bg-yellow-600">
+          Session
+        </Button>
 
-        <Card className="p-6 bg-card border-border hover:shadow-xl hover:shadow-yellow-500/10 transition-all">
-          <div className="flex items-center gap-3 mb-4">
-            <Car className="h-8 w-8 text-yellow-500" />
-            <h3 className="text-xl font-semibold text-yellow-500">Recent Bookings</h3>
-          </div>
-          <div className="space-y-3">
-            {bookings.map((b) => (
-              <div
-                key={b.id}
-                className="flex justify-between items-center p-3 bg-yellow-50 dark:bg-yellow-900/10 rounded-lg"
-              >
-                <div>
-                  <p className="font-medium text-yellow-700 dark:text-yellow-400">{b.location}</p>
-                  <p className="text-sm text-foreground/70">
-                    {b.date} at {b.time}
-                  </p>
-                </div>
-                <span
-                  className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    b.status === "Active" ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
-                  }`}
-                >
-                  {b.status}
-                </span>
-              </div>
-            ))}
-          </div>
-        </Card>
+        <Button 
+        onClick={() => router.push("/dashboard/presentation/users")}
+        className="bg-yellow-500 text-white hover:bg-yellow-600">
+          Cars
+        </Button>
+    
       </div>
     </div>
   );
@@ -281,7 +239,7 @@ const renderAdminContent = () => (
         return renderOwnerContent();
       case "SuperAdmin":
         return renderSuperAdminContent();
-      default:
+        default:
         return null;
     }
   };

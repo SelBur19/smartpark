@@ -18,7 +18,7 @@ export class AuthApiRepository implements AuthRepository {
       console.log("LOGIN RESPONSE:", data);
 
       if (data.status === "success") {
-        const user = new User(data.id, data.email, data.name, data.role);
+        const user = new User(data.id, data.email, data.name, data.role, data.token);
         // Token is stored in useLogin, not domain
         return { status: "success", user };
       }
