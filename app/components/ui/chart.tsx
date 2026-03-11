@@ -241,14 +241,27 @@ const ChartLegendContent = React.forwardRef<
     Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
       hideIcon?: boolean;
       nameKey?: string;
-    }
->(({ className, hideIcon = false, payload, verticalAlign = "bottom", nameKey }, ref) => {
-  const { config } = useChart();
+  // `LegendProps` omits `payload` (similar to TooltipProps above), so attempting
+  // to `Pick` it from that type results in a compile error.  The props that the
+  // legend **content** renderer actually receives are defined internally by
+  // Recharts and include `payload` and `verticalAlign`; we only care about those
+  // plus a few extras.  Rather than trying to pull them from `LegendProps`, we
+  // declare our own interface here with the minimal fields we use.
 
-  if (!payload?.length) {
-    return null;
-  }
+  type ChartLegendContentProps = React.ComponentProps<"div"> & {
+    payload?: Array<{
+      value?: string | number;
+      // the actual recharts payload object contains a few other fields but we
+      // only read `dataKey`, `color`, and `value` above, so allow arbitrary extras
+      [key: string]: any;
+    }>;
+    verticalAlign?: "top" | "bottom" | "middle";
+    hideIcon?: boolean;
+    nameKey?: string;
+  };
 
+  const ChartLegendContent = React.forwardRef<HTMLDivElement, ChartLegendContentProps>(
+    ({ className, hideIcon = false, payload, verticalAlign = "bottom", nameKey }, ref) => {
   return (
     <div
       ref={ref}
