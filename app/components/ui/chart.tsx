@@ -1,4 +1,4 @@
-import * as React from "react";
+import { createContext, forwardRef, useContext, useId, useMemo } from 'react';
 import * as RechartsPrimitive from "recharts";
 
 import { cn } from "../../lib/utils";
@@ -29,14 +29,14 @@ function useChart() {
   return context;
 }
 
-const ChartContainer = React.forwardRef<
+const ChartContainer = forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> & {
     config: ChartConfig;
     children: React.ComponentProps<typeof RechartsPrimitive.ResponsiveContainer>["children"];
   }
 >(({ id, className, children, config, ...props }, ref) => {
-  const uniqueId = React.useId();
+  const uniqueId = useId();
   const chartId = `chart-${id || uniqueId.replace(/:/g, "")}`;
 
   return (
