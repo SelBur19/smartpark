@@ -1,4 +1,4 @@
-import { createContext, forwardRef, useContext, useId, useMemo } from 'react';
+import React, { createContext, forwardRef, useContext, useId, useMemo } from 'react';
 import * as RechartsPrimitive from "recharts";
 
 import { cn } from "../../lib/utils";
