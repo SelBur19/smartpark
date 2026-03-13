@@ -36,7 +36,7 @@ export default function UsersPage() {
         formData.append("token", token);
 
         const response = await fetch(
-          "http://smartpark.htl-projekt.com/api_getUsers.php",
+          "https://smartpark.htl-projekt.com/api_getUsers.php",
           {
             method: "POST",
             headers: {
@@ -46,7 +46,20 @@ export default function UsersPage() {
           }
         );
 
+        if (!response.ok) {
+          const text = await response.text();
+          console.error(
+            "Failed to fetch users",
+            response.status,
+            response.statusText,
+            text
+          );
+          setError(`Failed to load users: ${response.status} ${response.statusText}`);
+          return;
+        }
+
         const data = await response.json();
+        console.log("USERS RESPONSE:", response.url, response.status, data);
 
         if (data.status === "success") {
           setUsers(data.data);
@@ -54,7 +67,8 @@ export default function UsersPage() {
           setError(data.message);
         }
       } catch (err) {
-        setError("Failed to load users");
+        console.error("Fetch users error:", err);
+        setError(`Failed to load users: ${(err as Error).message}`);
       } finally {
         setLoading(false);
       }
