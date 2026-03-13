@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { createContext, forwardRef, useContext, useId, useMemo, type ReactNode, type ComponentType } from 'react';
 import * as RechartsPrimitive from "recharts";
 
 import { cn } from "../../lib/utils";
@@ -8,8 +8,8 @@ const THEMES = { light: "", dark: ".dark" } as const;
 
 export type ChartConfig = {
   [k in string]: {
-    label?: React.ReactNode;
-    icon?: React.ComponentType;
+    label?: ReactNode;
+    icon?: ComponentType;
   } & ({ color?: string; theme?: never } | { color?: never; theme: Record<keyof typeof THEMES, string> });
 };
 
@@ -29,14 +29,14 @@ function useChart() {
   return context;
 }
 
-const ChartContainer = React.forwardRef<
+const ChartContainer = forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> & {
     config: ChartConfig;
     children: React.ComponentProps<typeof RechartsPrimitive.ResponsiveContainer>["children"];
   }
 >(({ id, className, children, config, ...props }, ref) => {
-  const uniqueId = React.useId();
+  const uniqueId = useId();
   const chartId = `chart-${id || uniqueId.replace(/:/g, "")}`;
 
   return (
@@ -235,58 +235,64 @@ ChartTooltipContent.displayName = "ChartTooltip";
 
 const ChartLegend = RechartsPrimitive.Legend;
 
-type ChartLegendContentProps = React.ComponentProps<"div"> & {
-  payload?: Array<{
-    value?: string | number;
-    dataKey?: string;
-    color?: string;
-    [key: string]: unknown;
-  }>;
-  verticalAlign?: "top" | "bottom" | "middle";
-  hideIcon?: boolean;
-  nameKey?: string;
-};
+const ChartLegendContent = React.forwardRef<
+  HTMLDivElement,
+  React.ComponentProps<"div"> &
+    Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
+      hideIcon?: boolean;
+      nameKey?: string;
+  // `LegendProps` omits `payload` (similar to TooltipProps above), so attempting
+  // to `Pick` it from that type results in a compile error.  The props that the
+  // legend **content** renderer actually receives are defined internally by
+  // Recharts and include `payload` and `verticalAlign`; we only care about those
+  // plus a few extras.  Rather than trying to pull them from `LegendProps`, we
+  // declare our own interface here with the minimal fields we use.
 
-const ChartLegendContent = React.forwardRef<HTMLDivElement, ChartLegendContentProps>(
-  ({ className, hideIcon = false, payload, verticalAlign = "bottom", nameKey }, ref) => {
-    const { config } = useChart();
+  type ChartLegendContentProps = React.ComponentProps<"div"> & {
+    payload?: Array<{
+      value?: string | number;
+      // the actual recharts payload object contains a few other fields but we
+      // only read `dataKey`, `color`, and `value` above, so allow arbitrary extras
+      [key: string]: any;
+    }>;
+    verticalAlign?: "top" | "bottom" | "middle";
+    hideIcon?: boolean;
+    nameKey?: string;
+  };
 
-    if (!payload?.length) {
-      return null;
-    }
+  const ChartLegendContent = React.forwardRef<HTMLDivElement, ChartLegendContentProps>(
+    ({ className, hideIcon = false, payload, verticalAlign = "bottom", nameKey }, ref) => {
+  return (
+    <div
+      ref={ref}
+      className={cn("flex items-center justify-center gap-4", verticalAlign === "top" ? "pb-3" : "pt-3", className)}
+    >
+      {payload.map((item) => {
+        const key = `${nameKey || item.dataKey || "value"}`;
+        const itemConfig = getPayloadConfigFromPayload(config, item, key);
 
-    return (
-      <div
-        ref={ref}
-        className={cn("flex items-center justify-center gap-4", verticalAlign === "top" ? "pb-3" : "pt-3", className)}
-      >
-        {payload.map((item) => {
-          const key = `${nameKey || item.dataKey || "value"}`;
-          const itemConfig = getPayloadConfigFromPayload(config, item, key);
-
-          return (
-            <div
-              key={item.value}
-              className={cn("flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground")}
-            >
-              {itemConfig?.icon && !hideIcon ? (
-                <itemConfig.icon />
-              ) : (
-                <div
-                  className="h-2 w-2 shrink-0 rounded-[2px]"
-                  style={{
-                    backgroundColor: item.color,
-                  }}
-                />
-              )}
-              {itemConfig?.label}
-            </div>
-          );
-        })}
-      </div>
-    );
-  }
-);
+        return (
+          <div
+            key={item.value}
+            className={cn("flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground")}
+          >
+            {itemConfig?.icon && !hideIcon ? (
+              <itemConfig.icon />
+            ) : (
+              <div
+                className="h-2 w-2 shrink-0 rounded-[2px]"
+                style={{
+                  backgroundColor: item.color,
+                }}
+              />
+            )}
+            {itemConfig?.label}
+          </div>
+        );
+      })}
+    </div>
+  );
+});
 ChartLegendContent.displayName = "ChartLegend";
 
 // Helper to extract item config from a payload.

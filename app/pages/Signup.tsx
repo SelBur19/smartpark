@@ -32,7 +32,7 @@ const Signup = () => {
     formData.append("role", role);
 
     try {
-      const res = await fetch("http://smartpark.htl-projekt.com/api_addUser.php", {
+      const res = await fetch("https://smartpark.htl-projekt.com/api_addUser.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: formData.toString(),

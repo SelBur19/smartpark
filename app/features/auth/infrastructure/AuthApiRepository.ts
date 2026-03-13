@@ -10,7 +10,7 @@ export class AuthApiRepository implements AuthRepository {
       formData.append("password", password);
 
       const response = await fetch(
-        "http://smartpark.htl-projekt.com/api_login.php",
+        "https://smartpark.htl-projekt.com/api_login.php",
         { method: "POST", body: formData }
       );
 
