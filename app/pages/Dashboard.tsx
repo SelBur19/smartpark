@@ -50,13 +50,13 @@ const renderAdminContent = () => (
         </Button>
 
         <Button 
-        onClick={() => router.push("/dashboard/presentation/users")}
+        onClick={() => router.push("/dashboard/presentation/sessions_admin")}
         className="bg-yellow-500 text-white hover:bg-yellow-600">
           Sessions
         </Button>
 
         <Button 
-        onClick={() => router.push("/dashboard/presentation/users")}
+        onClick={() => router.push("/dashboard/presentation/all_parkplaces")}
         className="bg-yellow-500 text-white hover:bg-yellow-600">
           All Parkplaces
         </Button>
@@ -68,13 +68,13 @@ const renderAdminContent = () => (
       <h2 className="text-lg font-semibold mb-4">Owner</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Button 
-        onClick={() => router.push("/dashboard/presentation/users")}
+        onClick={() => router.push("/dashboard/presentation/sessions_owner")}
         className="bg-yellow-500 text-white hover:bg-yellow-600">
           Session
         </Button>
 
         <Button 
-        onClick={() => router.push("/dashboard/presentation/users")}
+        onClick={() => router.push("/dashboard/presentation/parking_owner")}
         className="bg-yellow-500 text-white hover:bg-yellow-600">
           Parkplace
         </Button>
@@ -86,13 +86,13 @@ const renderAdminContent = () => (
       <h2 className="text-lg font-semibold mb-4">User</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Button 
-        onClick={() => router.push("/dashboard/presentation/users")}
+        onClick={() => router.push("/dashboard/presentation/sessions_users")}
         className="bg-yellow-500 text-white hover:bg-yellow-600">
           Session
         </Button>
 
         <Button 
-        onClick={() => router.push("/dashboard/presentation/users")}
+        onClick={() => router.push("/dashboard/presentation/cars_user")}
         className="bg-yellow-500 text-white hover:bg-yellow-600">
           Cars
         </Button>
