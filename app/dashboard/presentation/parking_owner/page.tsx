@@ -140,17 +140,19 @@ export default function ParkingOwnerPage() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-    
-      <main className="flex-1 container mx-auto py-24">
-        <Card className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold text-yellow-500">All Parkplaces</h1>
-            <Button variant="outline" onClick={() => router.back()}>
-              Back
-            </Button>
+      <main className="flex-1 container mx-auto py-8 px-4 md:py-24">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-bold text-yellow-500 mb-2">
+              Parking Places Overview
+            </h1>
+            <p className="text-gray-600">Manage and monitor your parking place occupancy</p>
           </div>
-        </Card>
-
+          <Button variant="outline" onClick={() => router.back()}>
+            Back
+          </Button>
+        </div>
 
         {/* Statistics Cards */}
         {!loading && !error && parkingPlaces.length > 0 && (
@@ -200,6 +202,19 @@ export default function ParkingOwnerPage() {
 
         {/* Main Content Card */}
         <Card className="p-6">
+          {/* Search Bar */}
+          {!loading && !error && parkingPlaces.length > 0 && (
+            <div className="mb-6 relative">
+              <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+              <Input
+                type="text"
+                placeholder="Search by name or address..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          )}
 
           {loading && (
             <div className="flex justify-center items-center py-12">
@@ -307,9 +322,17 @@ export default function ParkingOwnerPage() {
                 </table>
               </div>
 
-              {filteredParkingPlaces.length === 0 && (
+              {filteredParkingPlaces.length === 0 && searchTerm && (
                 <div className="text-center py-8">
-                  <p className="text-gray-600">No parking places available.</p>
+                  <p className="text-gray-600">No parking places match your search.</p>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSearchTerm("")}
+                    className="mt-2"
+                  >
+                    Clear search
+                  </Button>
                 </div>
               )}
             </>
