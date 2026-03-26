@@ -7,189 +7,206 @@ import Footer from "@/components/Footer";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowUpDown, Car, Clock, CheckCircle, DollarSign } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { ArrowUpDown, Car, CircleCheck, CircleOff, Plus, X } from "lucide-react";
 
-interface Session {
+interface CarEntry {
   plate_Number: string;
-  parkPlaceID: number;
-  entryTime: string;
-  exitTime: string | null;
-  cost: number;
-  status: string;
+  isActive: number;
 }
 
 interface SortConfig {
-  key: keyof Session | null;
+  key: keyof CarEntry | null;
   direction: "asc" | "desc";
 }
 
-export default function SessionsUsersPage() {
-  const [sessions, setSessions] = useState<Session[]>([]);
+export default function UserCarsPage() {
+  const [cars, setCars] = useState<CarEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: null, direction: "asc" });
 
+  // Modal state
+  const [showModal, setShowModal] = useState(false);
+  const [plateNumber, setPlateNumber] = useState("");
+  const [addLoading, setAddLoading] = useState(false);
+  const [addError, setAddError] = useState<string | null>(null);
+  const [addSuccess, setAddSuccess] = useState<string | null>(null);
+
   const router = useRouter();
-  const euroToLek = 120;
+
+  const getToken = () => {
+    const storedUser = localStorage.getItem("user");
+    if (!storedUser) return null;
+    const parsedUser = JSON.parse(storedUser);
+    return parsedUser?.token ?? null;
+  };
+
+  const fetchCars = async () => {
+    setLoading(true);
+    const token = getToken();
+    if (!token) { router.push("/login"); return; }
+
+    try {
+      const formData = new URLSearchParams();
+      formData.append("token", token);
+
+      const response = await fetch("https://smartpark.htl-projekt.com/api_getCarsU.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: formData.toString(),
+      });
+
+      const rawText = await response.text();
+      let data;
+      try {
+        data = JSON.parse(rawText);
+      } catch {
+        console.error("Non-JSON response from server:", rawText);
+        setError("Server returned an unexpected response.");
+        return;
+      }
+
+      if (data.status === "success") {
+        setCars(data.data);
+      } else {
+        setError(data.message || "Unknown error from server.");
+      }
+    } catch (err) {
+      setError(`Failed to load cars: ${(err as Error).message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchSessions = async () => {
-      const storedUser = localStorage.getItem("user");
-      if (!storedUser) return router.push("/login");
-
-      const parsedUser = JSON.parse(storedUser);
-      const token = parsedUser?.token;
-      if (!token) return router.push("/login");
-
-      try {
-        const formData = new URLSearchParams();
-        formData.append("token", token);
-
-        const response = await fetch("https://smartpark.htl-projekt.com/api_getSessionsU.php", {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: formData.toString(),
-        });
-
-        if (!response.ok) {
-          const text = await response.text();
-          setError(`Failed to load sessions: ${response.status} ${response.statusText}`);
-          console.error("Fetch sessions failed:", text);
-          return;
-        }
-
-        const data = await response.json();
-        if (data.status === "success") setSessions(data.data);
-        else setError(data.message);
-      } catch (err) {
-        setError(`Failed to load sessions: ${(err as Error).message}`);
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSessions();
+    const storedUser = localStorage.getItem("user");
+    if (!storedUser) { router.push("/login"); return; }
+    fetchCars();
   }, [router]);
 
-  const formatDate = (dateString: string) => {
-    if (!dateString) return "-";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("de-DE", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
+  const handleAddCar = async () => {
+    if (!plateNumber.trim()) {
+      setAddError("Please enter a plate number.");
+      return;
+    }
+
+    setAddLoading(true);
+    setAddError(null);
+    setAddSuccess(null);
+
+    const token = getToken();
+    if (!token) { router.push("/login"); return; }
+
+    try {
+      const formData = new URLSearchParams();
+      formData.append("token", token);
+      formData.append("plateNumber", plateNumber.trim());
+
+      const response = await fetch("https://smartpark.htl-projekt.com/api_addUserToCar.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: formData.toString(),
+      });
+
+      const rawText = await response.text();
+      let data;
+      try {
+        data = JSON.parse(rawText);
+      } catch {
+        setAddError("Server returned an unexpected response.");
+        return;
+      }
+
+      if (data.status === "success") {
+        setAddSuccess("Car added successfully!");
+        setPlateNumber("");
+        await fetchCars(); // refresh table
+        setTimeout(() => {
+          setShowModal(false);
+          setAddSuccess(null);
+        }, 1200);
+      } else {
+        setAddError(data.message || "Failed to add car.");
+      }
+    } catch (err) {
+      setAddError(`Error: ${(err as Error).message}`);
+    } finally {
+      setAddLoading(false);
+    }
   };
 
-  const getStatusBadge = (status: string) => {
-    const normalized = status?.toLowerCase() || "unknown";
-    if (normalized === "active") return <Badge className="bg-green-600">Active</Badge>;
-    if (normalized === "completed") return <Badge className="bg-blue-600">Completed</Badge>;
-    if (normalized === "cancelled") return <Badge variant="destructive">Cancelled</Badge>;
-    return <Badge variant="outline">{status}</Badge>;
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setPlateNumber("");
+    setAddError(null);
+    setAddSuccess(null);
   };
 
-  const handleSort = (key: keyof Session) => {
+  const getSorted = () => {
+    const sorted = [...cars];
+    if (sortConfig.key) {
+      sorted.sort((a, b) => {
+        const aVal = a[sortConfig.key as keyof CarEntry];
+        const bVal = b[sortConfig.key as keyof CarEntry];
+        if (typeof aVal === "string") {
+          return sortConfig.direction === "asc"
+            ? aVal.localeCompare(bVal as string)
+            : (bVal as string).localeCompare(aVal);
+        }
+        if (typeof aVal === "number") {
+          return sortConfig.direction === "asc"
+            ? aVal - (bVal as number)
+            : (bVal as number) - aVal;
+        }
+        return 0;
+      });
+    }
+    return sorted;
+  };
+
+  const handleSort = (key: keyof CarEntry) => {
     setSortConfig((prev) => ({
       key,
       direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc",
     }));
   };
 
-  const getFilteredAndSortedSessions = () => {
-    let filtered = [...sessions];
-    if (sortConfig.key) {
-      filtered.sort((a, b) => {
-        const aValue = a[sortConfig.key!];
-        const bValue = b[sortConfig.key!];
-        if (typeof aValue === "string") return sortConfig.direction === "asc" ? aValue.localeCompare(bValue as string) : (bValue as string).localeCompare(aValue);
-        if (typeof aValue === "number") return sortConfig.direction === "asc" ? (aValue as number) - (bValue as number) : (bValue as number) - (aValue as number);
-        return 0;
-      });
-    }
-    return filtered;
-  };
-
-  const filteredSessions = getFilteredAndSortedSessions();
-
-  const stats = {
-    totalSessions: sessions.length,
-    totalEarnings: sessions.reduce((sum, s) => sum + (typeof s.cost === "number" && !Number.isNaN(s.cost) ? s.cost * euroToLek : 0), 0),
-    activeSessions: sessions.filter((s) => s.status?.toLowerCase() === "active").length,
-    completedSessions: sessions.filter((s) => s.status?.toLowerCase() === "completed").length,
-  };
+  const sortedCars = getSorted();
 
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      <main className="flex-1 container mx-auto py-24">
+      <main className="flex-1 container mx-auto py-8 px-4 md:py-24">
 
-        {/* ✅ HEADER like Cars page */}
-        <Card className="p-6 mb-6">
-          <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-yellow-500">
-              My Parking Sessions
+        {/* Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-bold text-yellow-500 mb-2">
+              My Cars
             </h1>
-
-            <div className="flex gap-2">
-              {/* optional: you can add an "Add Session" button here if needed */}
-              <Button variant="outline" onClick={() => router.back()}>
-                Back
-              </Button>
-            </div>
+            <p className="text-gray-600">View and manage your registered vehicles</p>
           </div>
-        </Card>
-
-        {/* Statistics Cards */}
-        {!loading && !error && sessions.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <Card className="p-6 border border-yellow-500/20 bg-gradient-to-br from-yellow-50 to-transparent">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 mb-1">Total Sessions</p>
-                  <p className="text-3xl font-bold text-yellow-600">{stats.totalSessions}</p>
-                </div>
-                <Car className="w-10 h-10 text-yellow-500 opacity-20" />
-              </div>
-            </Card>
-
-            <Card className="p-6 border border-green-500/20 bg-gradient-to-br from-green-50 to-transparent">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 mb-1">Active Sessions</p>
-                  <p className="text-3xl font-bold text-green-600">{stats.activeSessions}</p>
-                </div>
-                <Clock className="w-10 h-10 text-green-500 opacity-20" />
-              </div>
-            </Card>
-
-            <Card className="p-6 border border-blue-500/20 bg-gradient-to-br from-blue-50 to-transparent">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 mb-1">Completed</p>
-                  <p className="text-3xl font-bold text-blue-600">{stats.completedSessions}</p>
-                </div>
-                <CheckCircle className="w-10 h-10 text-blue-500 opacity-20" />
-              </div>
-            </Card>
-
-            <Card className="p-6 border border-purple-500/20 bg-gradient-to-br from-purple-50 to-transparent">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 mb-1">Total Earnings</p>
-                  <p className="text-3xl font-bold text-purple-600">{stats.totalEarnings.toLocaleString()} Lek</p>
-                </div>
-                <DollarSign className="w-10 h-10 text-purple-500 opacity-20" />
-              </div>
-            </Card>
+          <div className="flex items-center gap-2">
+            <Button onClick={() => setShowModal(true)} className="bg-yellow-500 hover:bg-yellow-600 text-white">
+              <Plus className="w-4 h-4 mr-2" />
+              Add Car
+            </Button>
+            <Button variant="outline" onClick={() => router.back()}>
+              Back
+            </Button>
           </div>
-        )}
+        </div>
 
-        {/* Sessions Table */}
+        {/* Table Card */}
         <Card className="p-6">
+
           {loading && (
             <div className="flex justify-center items-center py-12">
               <div className="text-center">
-                <div className="w-12 h-12 border-4 border-yellow-500/20 border-t-yellow-500 rounded-full animate-spin mx-auto mb-4"></div>
-                <p className="text-gray-600">Loading sessions...</p>
+                <div className="w-12 h-12 border-4 border-yellow-500/20 border-t-yellow-500 rounded-full animate-spin mx-auto mb-4" />
+                <p className="text-gray-600">Loading vehicles...</p>
               </div>
             </div>
           )}
@@ -201,57 +218,68 @@ export default function SessionsUsersPage() {
             </div>
           )}
 
-          {!loading && !error && sessions.length === 0 && (
+          {!loading && !error && cars.length === 0 && (
             <div className="text-center py-12">
               <Car className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-600 text-lg">No sessions found.</p>
-              <p className="text-gray-500 text-sm mt-2">Your parking sessions will appear here.</p>
+              <p className="text-gray-600 text-lg">No vehicles found.</p>
+              <p className="text-gray-500 text-sm mt-2">Add your first car using the button above.</p>
             </div>
           )}
 
-          {!loading && !error && sessions.length > 0 && (
+          {!loading && !error && cars.length > 0 && (
             <>
               <div className="mb-4 text-sm text-gray-600">
-                Showing {filteredSessions.length} of {sessions.length} sessions
+                Showing {sortedCars.length} of {cars.length} vehicles
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b bg-gray-50/50">
-                      {[ 
-                        { key: "plate_Number", label: "License Plate" },
-                        { key: "parkPlaceID", label: "Parking Spot" },
-                        { key: "entryTime", label: "Entry Time" },
-                        { key: "exitTime", label: "Exit Time" },
-                        { key: "cost", label: "Cost (Lek)" },
-                        { key: "status", label: "Status" },
-                      ].map((col) => (
-                        <th key={col.key} className="text-left py-4 px-3 font-semibold text-gray-700">
-                          <button
-                            onClick={() => handleSort(col.key as keyof Session)}
-                            className="flex items-center gap-2 hover:text-gray-900"
-                          >
-                            {col.label} <ArrowUpDown className="w-4 h-4" />
-                          </button>
-                        </th>
-                      ))}
+                      <th className="text-left py-4 px-3 font-semibold text-gray-700 w-12">#</th>
+                      <th className="text-left py-4 px-3 font-semibold text-gray-700">
+                        <button
+                          onClick={() => handleSort("plate_Number")}
+                          className="flex items-center gap-2 hover:text-gray-900"
+                        >
+                          Plate Number <ArrowUpDown className="w-4 h-4" />
+                        </button>
+                      </th>
+                      <th className="text-left py-4 px-3 font-semibold text-gray-700">
+                        <button
+                          onClick={() => handleSort("isActive")}
+                          className="flex items-center gap-2 hover:text-gray-900"
+                        >
+                          Status <ArrowUpDown className="w-4 h-4" />
+                        </button>
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredSessions.map((session, idx) => (
-                      <tr key={idx} className="border-b hover:bg-yellow-500/5 transition-colors duration-150">
-                        <td className="py-4 px-3 font-medium text-gray-900">{session.plate_Number}</td>
-                        <td className="py-4 px-3 text-gray-700">
-                          <Badge variant="outline">#{session.parkPlaceID}</Badge>
+                    {sortedCars.map((car, index) => (
+                      <tr
+                        key={index}
+                        className="border-b hover:bg-yellow-500/5 transition-colors duration-150"
+                      >
+                        <td className="py-4 px-3 text-gray-400 text-sm">{index + 1}</td>
+                        <td className="py-4 px-3 font-medium text-gray-900">
+                          <div className="flex items-center gap-2">
+                            <Car className="w-4 h-4 text-gray-400" />
+                            {car.plate_Number}
+                          </div>
                         </td>
-                        <td className="py-4 px-3 text-sm text-gray-600">{formatDate(session.entryTime)}</td>
-                        <td className="py-4 px-3 text-sm text-gray-600">
-                          {session.exitTime ? formatDate(session.exitTime) : <span className="text-yellow-600 font-medium">In Progress</span>}
+                        <td className="py-4 px-3">
+                          {car.isActive === 1 ? (
+                            <Badge className="bg-green-100 text-green-700 border border-green-200 hover:bg-green-100">
+                              <CircleCheck className="w-3 h-3 mr-1" />
+                              Parked
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="text-gray-500">
+                              <CircleOff className="w-3 h-3 mr-1" />
+                              Not Parked
+                            </Badge>
+                          )}
                         </td>
-                        <td className="py-4 px-3 font-semibold text-yellow-600">
-                          {typeof session.cost === "number" && !Number.isNaN(session.cost) ? `${(session.cost * euroToLek).toLocaleString()} Lek` : "-"}
-                        </td>
-                        <td className="py-4 px-3">{getStatusBadge(session.status)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -263,6 +291,78 @@ export default function SessionsUsersPage() {
       </main>
 
       <Footer />
+
+      {/* Add Car Modal */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-6">
+
+            {/* Modal Header */}
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-gray-900">Add a Car</h2>
+              <button
+                onClick={handleCloseModal}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Input */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Plate Number
+              </label>
+              <Input
+                type="text"
+                placeholder="e.g. AA123BB"
+                value={plateNumber}
+                onChange={(e) => setPlateNumber(e.target.value.toUpperCase())}
+                onKeyDown={(e) => e.key === "Enter" && handleAddCar()}
+                className="uppercase"
+              />
+            </div>
+
+            {/* Error */}
+            {addError && (
+              <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-3">
+                <p className="text-red-600 text-sm">{addError}</p>
+              </div>
+            )}
+
+            {/* Success */}
+            {addSuccess && (
+              <div className="mb-4 bg-green-50 border border-green-200 rounded-lg p-3">
+                <p className="text-green-600 text-sm">{addSuccess}</p>
+              </div>
+            )}
+
+            {/* Modal Footer */}
+            <div className="flex justify-end gap-2 mt-6">
+              <Button variant="outline" onClick={handleCloseModal} disabled={addLoading}>
+                Cancel
+              </Button>
+              <Button
+                onClick={handleAddCar}
+                disabled={addLoading}
+                className="bg-yellow-500 hover:bg-yellow-600 text-white"
+              >
+                {addLoading ? (
+                  <span className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Adding...
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2">
+                    <Plus className="w-4 h-4" />
+                    Add Car
+                  </span>
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

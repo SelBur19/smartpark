@@ -44,7 +44,7 @@ const renderAdminContent = () => (
         </Button>
 
         <Button 
-        onClick={() => router.push("/dashboard/presentation/users")}
+        onClick={() => router.push("/dashboard/presentation/registered_cars")}
         className="bg-yellow-500 text-white hover:bg-yellow-600">
           Registered Cars
         </Button>

@@ -6,8 +6,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { ArrowUpDown, MapPin, Car, ParkingCircle, Users } from "lucide-react";
+import { ArrowUpDown, MapPin, Car, ParkingCircle } from "lucide-react";
 
 interface ParkPlace {
   id: number;
@@ -64,12 +63,7 @@ export default function AllParkPlacesPage() {
 
         if (!response.ok) {
           const text = await response.text();
-          console.error(
-            "Failed to fetch park places",
-            response.status,
-            response.statusText,
-            text
-          );
+          console.error("Failed to fetch park places", response.status, response.statusText, text);
           setError(`Failed to load park places: ${response.status} ${response.statusText}`);
           return;
         }
@@ -125,27 +119,31 @@ export default function AllParkPlacesPage() {
 
   const stats = {
     totalPlaces: parkPlaces.length,
-    totalSpots: parkPlaces.reduce((sum, place) => sum + place.max_Spots, 0),
     occupiedSpots: parkPlaces.reduce((sum, place) => sum + place.occupied, 0),
-    freeSpots: parkPlaces.reduce((sum, place) => sum + place.freeSpots, 0),
   };
 
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      <main className="flex-1 container mx-auto py-24">
-        <Card className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold text-yellow-500">All Parkplaces</h1>
-            <Button variant="outline" onClick={() => router.back()}>
-              Back
-            </Button>
-          </div>
-        </Card>
+      <main className="flex-1 container mx-auto py-8 px-4 md:py-24">
 
+        {/* Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-bold text-yellow-500 mb-2">
+              All Parkplaces
+            </h1>
+            <p className="text-gray-600">Admin panel — overview of all parking locations</p>
+          </div>
+          <Button variant="outline" onClick={() => router.back()}>
+            Back
+          </Button>
+        </div>
+
+        {/* Statistics Cards — only Total Places & Occupied */}
         {!loading && !error && parkPlaces.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
             <Card className="p-6 border border-yellow-500/20 bg-gradient-to-br from-yellow-50 to-transparent">
               <div className="flex items-center justify-between">
                 <div>
@@ -153,16 +151,6 @@ export default function AllParkPlacesPage() {
                   <p className="text-3xl font-bold text-yellow-600">{stats.totalPlaces}</p>
                 </div>
                 <ParkingCircle className="w-10 h-10 text-yellow-500 opacity-20" />
-              </div>
-            </Card>
-
-            <Card className="p-6 border border-green-500/20 bg-gradient-to-br from-green-50 to-transparent">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 mb-1">Total Spots</p>
-                  <p className="text-3xl font-bold text-green-600">{stats.totalSpots}</p>
-                </div>
-                <Users className="w-10 h-10 text-green-500 opacity-20" />
               </div>
             </Card>
 
@@ -175,24 +163,15 @@ export default function AllParkPlacesPage() {
                 <Car className="w-10 h-10 text-blue-500 opacity-20" />
               </div>
             </Card>
-
-            <Card className="p-6 border border-purple-500/20 bg-gradient-to-br from-purple-50 to-transparent">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600 mb-1">Free Spots</p>
-                  <p className="text-3xl font-bold text-purple-600">{stats.freeSpots}</p>
-                </div>
-                <MapPin className="w-10 h-10 text-purple-500 opacity-20" />
-              </div>
-            </Card>
           </div>
         )}
 
+        {/* Table Card */}
         <Card className="p-6">
           {loading && (
             <div className="flex justify-center items-center py-12">
               <div className="text-center">
-                <div className="w-12 h-12 border-4 border-yellow-500/20 border-t-yellow-500 rounded-full animate-spin mx-auto mb-4"></div>
+                <div className="w-12 h-12 border-4 border-yellow-500/20 border-t-yellow-500 rounded-full animate-spin mx-auto mb-4" />
                 <p className="text-gray-600">Loading parkplaces...</p>
               </div>
             </div>
@@ -208,7 +187,9 @@ export default function AllParkPlacesPage() {
           {!loading && !error && parkPlaces.length === 0 && (
             <div className="text-center py-12">
               <p className="text-gray-600 text-lg">No parkplaces found.</p>
-              <p className="text-gray-500 text-sm mt-2">Your parkplaces will appear here after successful API response.</p>
+              <p className="text-gray-500 text-sm mt-2">
+                Your parkplaces will appear here after successful API response.
+              </p>
             </div>
           )}
 
@@ -223,39 +204,37 @@ export default function AllParkPlacesPage() {
                     <tr className="border-b bg-gray-50/50">
                       <th className="text-left py-4 px-3 font-semibold text-gray-700">
                         <button onClick={() => handleSort("name")} className="flex items-center gap-2 hover:text-gray-900">
-                          Name
-                          <ArrowUpDown className="w-4 h-4" />
+                          Name <ArrowUpDown className="w-4 h-4" />
                         </button>
                       </th>
                       <th className="text-left py-4 px-3 font-semibold text-gray-700">
                         <button onClick={() => handleSort("address")} className="flex items-center gap-2 hover:text-gray-900">
-                          Address
-                          <ArrowUpDown className="w-4 h-4" />
+                          Address <ArrowUpDown className="w-4 h-4" />
                         </button>
                       </th>
                       <th className="text-left py-4 px-3 font-semibold text-gray-700">
                         <button onClick={() => handleSort("max_Spots")} className="flex items-center gap-2 hover:text-gray-900">
-                          Max Spots
-                          <ArrowUpDown className="w-4 h-4" />
+                          Max Spots <ArrowUpDown className="w-4 h-4" />
                         </button>
                       </th>
                       <th className="text-left py-4 px-3 font-semibold text-gray-700">
                         <button onClick={() => handleSort("occupied")} className="flex items-center gap-2 hover:text-gray-900">
-                          Occupied
-                          <ArrowUpDown className="w-4 h-4" />
+                          Occupied <ArrowUpDown className="w-4 h-4" />
                         </button>
                       </th>
                       <th className="text-left py-4 px-3 font-semibold text-gray-700">
                         <button onClick={() => handleSort("freeSpots")} className="flex items-center gap-2 hover:text-gray-900">
-                          Free Spots
-                          <ArrowUpDown className="w-4 h-4" />
+                          Free Spots <ArrowUpDown className="w-4 h-4" />
                         </button>
                       </th>
                     </tr>
                   </thead>
                   <tbody>
                     {sortedParkPlaces.map((place) => (
-                      <tr key={place.id} className="border-b hover:bg-yellow-500/5 transition-colors duration-150">
+                      <tr
+                        key={place.id}
+                        className="border-b hover:bg-yellow-500/5 transition-colors duration-150"
+                      >
                         <td className="py-4 px-3 font-medium text-gray-900">{place.name}</td>
                         <td className="py-4 px-3 text-gray-700 flex items-center gap-2">
                           <MapPin className="w-4 h-4 text-gray-400" />
@@ -269,12 +248,6 @@ export default function AllParkPlacesPage() {
                   </tbody>
                 </table>
               </div>
-
-              {sortedParkPlaces.length === 0 && (
-                <div className="text-center py-8">
-                  <p className="text-gray-600">No parkplaces available.</p>
-                </div>
-              )}
             </>
           )}
         </Card>
