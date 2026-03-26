@@ -6,12 +6,9 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { User as UserIcon, BarChart3, Settings, Users, Building, Car, MapPin } from "lucide-react";
+import { User as UserIcon, BarChart3, Users, Building, Car } from "lucide-react";
 import { useDashboard } from "@/dashboard/presentation/useDashboard";
 import { User } from "@/dashboard/domain/entities/User";
-
-
-
 
 const DashboardPage = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -30,164 +27,101 @@ const DashboardPage = () => {
 
   if (!user) return null;
 
-const renderAdminContent = () => (
-  <div className="space-y-10">
+  const renderAdminContent = () => (
+    <div className="space-y-10">
 
-    {/* First 4 Buttons */}
-    <div>
-      <h2 className="text-lg font-semibold mb-4">Admin</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Button 
-        onClick={() => router.push("/dashboard/presentation/users")}
-        className="bg-yellow-500 text-white hover:bg-yellow-600">
-          View All Users
-        </Button>
+      <div>
+        <h2 className="text-lg font-semibold mb-4">Admin</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Button onClick={() => router.push("/dashboard/presentation/users")} className="bg-yellow-500 text-white hover:bg-yellow-600">
+            View All Users
+          </Button>
 
-        <Button 
-        onClick={() => router.push("/dashboard/presentation/registered_cars")}
-        className="bg-yellow-500 text-white hover:bg-yellow-600">
-          Registered Cars
-        </Button>
+          <Button onClick={() => router.push("/dashboard/presentation/registered_cars")} className="bg-yellow-500 text-white hover:bg-yellow-600">
+            Registered Cars
+          </Button>
 
-        <Button 
-        onClick={() => router.push("/dashboard/presentation/sessions_admin")}
-        className="bg-yellow-500 text-white hover:bg-yellow-600">
-          Sessions
-        </Button>
+          <Button onClick={() => router.push("/dashboard/presentation/sessions_admin")} className="bg-yellow-500 text-white hover:bg-yellow-600">
+            Sessions
+          </Button>
 
-        <Button 
-        onClick={() => router.push("/dashboard/presentation/all_parkplaces")}
-        className="bg-yellow-500 text-white hover:bg-yellow-600">
-          All Parkplaces
-        </Button>
+          <Button onClick={() => router.push("/dashboard/presentation/all_parkplaces")} className="bg-yellow-500 text-white hover:bg-yellow-600">
+            All Parkplaces
+          </Button>
+        </div>
       </div>
-    </div>
 
-    {/* Next 2 Buttons */}
-    <div>
-      <h2 className="text-lg font-semibold mb-4">Owner</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Button 
-        onClick={() => router.push("/dashboard/presentation/sessions_owner")}
-        className="bg-yellow-500 text-white hover:bg-yellow-600">
-          Session
-        </Button>
+      <div>
+        <h2 className="text-lg font-semibold mb-4">Owner</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Button onClick={() => router.push("/dashboard/presentation/sessions_owner")} className="bg-yellow-500 text-white hover:bg-yellow-600">
+            Session
+          </Button>
 
-        <Button 
-        onClick={() => router.push("/dashboard/presentation/parking_owner")}
-        className="bg-yellow-500 text-white hover:bg-yellow-600">
-          Parkplace
-        </Button>
+          <Button onClick={() => router.push("/dashboard/presentation/parking_owner")} className="bg-yellow-500 text-white hover:bg-yellow-600">
+            Parkplace
+          </Button>
+        </div>
       </div>
-    </div>
 
-    {/* Last 2 Buttons */}
-    <div>
-      <h2 className="text-lg font-semibold mb-4">User</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Button 
-        onClick={() => router.push("/dashboard/presentation/sessions_users")}
-        className="bg-yellow-500 text-white hover:bg-yellow-600">
-          Session
-        </Button>
+      <div>
+        <h2 className="text-lg font-semibold mb-4">User</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Button onClick={() => router.push("/dashboard/presentation/sessions_users")} className="bg-yellow-500 text-white hover:bg-yellow-600">
+            Session
+          </Button>
 
-        <Button 
-        onClick={() => router.push("/dashboard/presentation/cars_user")}
-        className="bg-yellow-500 text-white hover:bg-yellow-600">
-          Cars
-        </Button>
+          <Button onClick={() => router.push("/dashboard/presentation/cars_user")} className="bg-yellow-500 text-white hover:bg-yellow-600">
+            Cars
+          </Button>
+        </div>
       </div>
+
     </div>
+  );
 
-  </div>
-);
-
-  
   const renderUserContent = () => (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Button 
-        onClick={() => router.push("/dashboard/presentation/users")}
-        className="bg-yellow-500 text-white hover:bg-yellow-600">
+        <Button onClick={() => router.push("/dashboard/presentation/users")} className="bg-yellow-500 text-white hover:bg-yellow-600">
           Session
         </Button>
 
-        <Button 
-        onClick={() => router.push("/dashboard/presentation/users")}
-        className="bg-yellow-500 text-white hover:bg-yellow-600">
+        <Button onClick={() => router.push("/dashboard/presentation/users")} className="bg-yellow-500 text-white hover:bg-yellow-600">
           Cars
         </Button>
-    
       </div>
     </div>
   );
 
   const renderOwnerContent = () => (
-      <div>
+    <div>
       <h2 className="text-lg font-semibold mb-4">Owner</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Button 
-        onClick={() => router.push("/dashboard/presentation/users")}
-        className="bg-yellow-500 text-white hover:bg-yellow-600">
+        <Button onClick={() => router.push("/dashboard/presentation/users")} className="bg-yellow-500 text-white hover:bg-yellow-600">
           Session
         </Button>
 
-        <Button 
-        onClick={() => router.push("/dashboard/presentation/users")}
-        className="bg-yellow-500 text-white hover:bg-yellow-600">
+        <Button onClick={() => router.push("/dashboard/presentation/parking_owner")} className="bg-yellow-500 text-white hover:bg-yellow-600">
           Parkplace
         </Button>
       </div>
-       <div>
-      <h2 className="text-lg font-semibold mb-4">User</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Button 
-        onClick={() => router.push("/dashboard/presentation/users")}
-        className="bg-yellow-500 text-white hover:bg-yellow-600">
-          Session
-        </Button>
 
-        <Button 
-        onClick={() => router.push("/dashboard/presentation/users")}
-        className="bg-yellow-500 text-white hover:bg-yellow-600">
-          Cars
-        </Button>
+      <div>
+        <h2 className="text-lg font-semibold mb-4">User</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Button onClick={() => router.push("/dashboard/presentation/users")} className="bg-yellow-500 text-white hover:bg-yellow-600">
+            Session
+          </Button>
+
+          <Button onClick={() => router.push("/dashboard/presentation/users")} className="bg-yellow-500 text-white hover:bg-yellow-600">
+            Cars
+          </Button>
+        </div>
       </div>
     </div>
-    </div>
   );
 
-    const renderSuperAdminContent = () => (
-      //TODO: Superadmin view
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <Card className="p-6 bg-card border-border hover:shadow-xl hover:shadow-yellow-500/10 transition-all">
-        <div className="flex items-center gap-3 mb-4">
-          <Building className="h-8 w-8 text-yellow-500" />
-          <h3 className="text-xl font-semibold text-yellow-500">Dispatcher's Accounts</h3>
-        </div>
-        <p className="text-3xl font-bold text-yellow-500 mb-2">8</p>
-        <p className="text-foreground/70">Total parking lots</p>
-      </Card>
-
-      <Card className="p-6 bg-card border-border hover:shadow-xl hover:shadow-yellow-500/10 transition-all">
-        <div className="flex items-center gap-3 mb-4">
-          <BarChart3 className="h-8 w-8 text-yellow-500" />
-          <h3 className="text-xl font-semibold text-yellow-500">Total Users</h3>
-        </div>
-        <p className="text-3xl font-bold text-yellow-500 mb-2">$3,450</p>
-        <p className="text-foreground/70">+15% from last month</p>
-      </Card>
-
-      <Card className="p-6 bg-card border-border hover:shadow-xl hover:shadow-yellow-500/10 transition-all">
-        <div className="flex items-center gap-3 mb-4">
-          <Car className="h-8 w-8 text-yellow-500" />
-          <h3 className="text-xl font-semibold text-yellow-500">Total Bookings</h3>
-        </div>
-        <p className="text-3xl font-bold text-yellow-500 mb-2">127</p>
-        <p className="text-foreground/70">This month</p>
-      </Card>
-    </div>
-  );
 
   const renderProfile = () => (
     <Card className="p-6 bg-card border-border hover:shadow-xl hover:shadow-yellow-500/10 transition-all">
@@ -223,9 +157,6 @@ const renderAdminContent = () => (
         </div>
       </div>
 
-      <Button className="w-full mt-6 bg-yellow-500 text-white hover:bg-yellow-600 hover:shadow-lg hover:shadow-yellow-500/30 transition-all">
-        Edit Profile
-      </Button>
     </Card>
   );
 
@@ -237,9 +168,7 @@ const renderAdminContent = () => (
         return renderUserContent();
       case "Owner":
         return renderOwnerContent();
-      case "SuperAdmin":
-        return renderSuperAdminContent();
-        default:
+      default:
         return null;
     }
   };
@@ -249,50 +178,38 @@ const renderAdminContent = () => (
       <Navbar />
       <main className="flex-1 px-4 py-24 container mx-auto max-w-6xl">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-2">Welcome back, {user.name}!</h1>
+          <h1 className="text-4xl font-bold text-foreground mb-2">
+            Welcome back, {user.name}!
+          </h1>
           <p className="text-foreground/70">{user.role} Dashboard</p>
         </div>
 
         <div className="flex gap-4 mb-8 border-b border-border">
           <button
             onClick={() => setActiveTab("profile")}
-            className={`pb-3 px-1 font-medium transition-colors ${
-              activeTab === "profile" ? "text-primary border-b-2 border-primary" : "text-foreground/70 hover:text-foreground"
+            className={`pb-3 px-1 font-medium ${
+              activeTab === "profile"
+                ? "text-primary border-b-2 border-primary"
+                : "text-foreground/70"
             }`}
           >
             <UserIcon className="inline h-4 w-4 mr-2" /> Profile
           </button>
+
           <button
             onClick={() => setActiveTab("dashboard")}
-            className={`pb-3 px-1 font-medium transition-colors ${
-              activeTab === "dashboard" ? "text-primary border-b-2 border-primary" : "text-foreground/70 hover:text-foreground"
+            className={`pb-3 px-1 font-medium ${
+              activeTab === "dashboard"
+                ? "text-primary border-b-2 border-primary"
+                : "text-foreground/70"
             }`}
           >
             <BarChart3 className="inline h-4 w-4 mr-2" /> Dashboard
-          </button>
-          <button
-            onClick={() => setActiveTab("settings")}
-            className={`pb-3 px-1 font-medium transition-colors ${
-              activeTab === "settings" ? "text-primary border-b-2 border-primary" : "text-foreground/70 hover:text-foreground"
-            }`}
-          >
-            <Settings className="inline h-4 w-4 mr-2" /> Settings
           </button>
         </div>
 
         {activeTab === "profile" && renderProfile()}
         {activeTab === "dashboard" && renderRoleDashboard()}
-        {activeTab === "settings" && (
-          <Card className="p-6 bg-card border-border">
-            <h3 className="text-xl font-semibold mb-4">Account Settings</h3>
-            <div className="space-y-4">
-              <Button className="w-full justify-start outline">Change Password</Button>
-              <Button className="w-full justify-start outline">Notification Settings</Button>
-              <Button className="w-full justify-start outline">Privacy Settings</Button>
-              <Button className="w-full destructive">Delete Account</Button>
-            </div>
-          </Card>
-        )}
       </main>
       <Footer />
     </div>

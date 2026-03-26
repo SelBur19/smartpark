@@ -7,7 +7,7 @@ import Footer from "@/components/Footer";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowUpDown, Car, Clock } from "lucide-react";
+import { ArrowUpDown, Car, Clock, CreditCard, X, CheckCircle } from "lucide-react";
 
 interface Session {
   plate_Number: string;
@@ -29,8 +29,23 @@ export default function SessionsUsersPage() {
   const [error, setError] = useState<string | null>(null);
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: null, direction: "asc" });
 
+  // Pay modal state
+  const [showPayModal, setShowPayModal] = useState(false);
+  const [priceLoading, setPriceLoading] = useState(false);
+  const [priceError, setPriceError] = useState<string | null>(null);
+  const [totalPrice, setTotalPrice] = useState<number | null>(null);
+  const [payLoading, setPayLoading] = useState(false);
+  const [payError, setPayError] = useState<string | null>(null);
+  const [paySuccess, setPaySuccess] = useState(false);
+
   const router = useRouter();
   const euroToLek = 120;
+
+  const getToken = () => {
+    const storedUser = localStorage.getItem("user");
+    if (!storedUser) return null;
+    return JSON.parse(storedUser)?.token ?? null;
+  };
 
   useEffect(() => {
     const fetchSessions = async () => {
@@ -52,9 +67,7 @@ export default function SessionsUsersPage() {
         });
 
         if (!response.ok) {
-          const text = await response.text();
           setError(`Failed to load sessions: ${response.status} ${response.statusText}`);
-          console.error("Fetch sessions failed:", text);
           return;
         }
 
@@ -63,7 +76,6 @@ export default function SessionsUsersPage() {
         else setError(data.message);
       } catch (err) {
         setError(`Failed to load sessions: ${(err as Error).message}`);
-        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -71,6 +83,102 @@ export default function SessionsUsersPage() {
 
     fetchSessions();
   }, [router]);
+
+  const handleOpenPayModal = async () => {
+    setShowPayModal(true);
+    setPaySuccess(false);
+    setPayError(null);
+    setPriceError(null);
+    setTotalPrice(null);
+    setPriceLoading(true);
+
+    const token = getToken();
+    if (!token) { router.push("/login"); return; }
+
+    try {
+      const formData = new URLSearchParams();
+      formData.append("token", token);
+
+      const response = await fetch("https://smartpark.htl-projekt.com/api_getPrice.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: formData.toString(),
+      });
+
+      const rawText = await response.text();
+      let data;
+      try {
+        data = JSON.parse(rawText);
+      } catch {
+        setPriceError("Server returned an unexpected response.");
+        return;
+      }
+
+      if (data.status === "success") {
+        const raw = parseFloat(data.price?.price ?? data.price ?? 0);
+        setTotalPrice(isNaN(raw) ? 0 : raw);
+      } else {
+        setPriceError(data.message || "Failed to fetch price.");
+      }
+    } catch (err) {
+      setPriceError(`Error: ${(err as Error).message}`);
+    } finally {
+      setPriceLoading(false);
+    }
+  };
+
+  const handlePay = async () => {
+    setPayLoading(true);
+    setPayError(null);
+
+    const token = getToken();
+    if (!token) { router.push("/login"); return; }
+
+    try {
+      const formData = new URLSearchParams();
+      formData.append("token", token);
+
+      const response = await fetch("https://smartpark.htl-projekt.com/api_pay.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: formData.toString(),
+      });
+
+      const rawText = await response.text();
+      let data;
+      try {
+        data = JSON.parse(rawText);
+      } catch {
+        setPayError("Server returned an unexpected response.");
+        return;
+      }
+
+      if (data.status === "success") {
+        setPaySuccess(true);
+        // Refresh sessions after payment
+        setTimeout(() => {
+          setShowPayModal(false);
+          setPaySuccess(false);
+          window.location.reload();
+        }, 1800);
+      } else {
+        setPayError(data.message || "Payment failed.");
+      }
+    } catch (err) {
+      setPayError(`Error: ${(err as Error).message}`);
+    } finally {
+      setPayLoading(false);
+    }
+  };
+
+  const handleClosePayModal = () => {
+    if (payLoading) return;
+    setShowPayModal(false);
+    setTotalPrice(null);
+    setPriceError(null);
+    setPayError(null);
+    setPaySuccess(false);
+  };
 
   const formatDate = (dateString: string) => {
     if (!dateString) return "-";
@@ -111,8 +219,8 @@ export default function SessionsUsersPage() {
             : (bValue as string).localeCompare(aValue);
         if (typeof aValue === "number")
           return sortConfig.direction === "asc"
-            ? (aValue as number) - (bValue as number)
-            : (bValue as number) - (aValue as number);
+            ? aValue - (bValue as number)
+            : (bValue as number) - aValue;
         return 0;
       });
     }
@@ -125,6 +233,8 @@ export default function SessionsUsersPage() {
     totalSessions: sessions.length,
     activeSessions: sessions.filter((s) => s.status?.toLowerCase() === "active").length,
   };
+
+  const hasPending = sessions.some((s) => s.status?.toLowerCase() === "pending");
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -140,10 +250,19 @@ export default function SessionsUsersPage() {
             </h1>
             <p className="text-gray-600">View and track your parking session history</p>
           </div>
-          <Button variant="outline" onClick={() => router.back()}>Back</Button>
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={handleOpenPayModal}
+              className="bg-green-600 hover:bg-green-700 text-white"
+            >
+              <CreditCard className="w-4 h-4 mr-2" />
+              Pay All Sessions
+            </Button>
+            <Button variant="outline" onClick={() => router.back()}>Back</Button>
+          </div>
         </div>
 
-        {/* Stats Cards — Total Sessions & Active only */}
+        {/* Stats Cards */}
         {!loading && !error && sessions.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
             <Card className="p-6 border border-yellow-500/20 bg-gradient-to-br from-yellow-50 to-transparent">
@@ -257,6 +376,102 @@ export default function SessionsUsersPage() {
       </main>
 
       <Footer />
+
+      {/* Pay Modal */}
+      {showPayModal && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm mx-4 p-6">
+
+            {/* Modal Header */}
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-gray-900">Pay All Sessions</h2>
+              <button
+                onClick={handleClosePayModal}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+                disabled={payLoading}
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Success state */}
+            {paySuccess ? (
+              <div className="flex flex-col items-center py-6 gap-3">
+                <CheckCircle className="w-14 h-14 text-green-500" />
+                <p className="text-green-700 font-semibold text-lg">Payment Successful!</p>
+                <p className="text-gray-500 text-sm">All sessions have been marked as paid.</p>
+              </div>
+            ) : (
+              <>
+                {/* Price loading */}
+                {priceLoading && (
+                  <div className="flex flex-col items-center py-8 gap-3">
+                    <div className="w-10 h-10 border-4 border-green-500/20 border-t-green-500 rounded-full animate-spin" />
+                    <p className="text-gray-500 text-sm">Calculating total...</p>
+                  </div>
+                )}
+
+                {/* Price error */}
+                {priceError && (
+                  <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-3">
+                    <p className="text-red-600 text-sm">{priceError}</p>
+                  </div>
+                )}
+
+                {/* Price display */}
+                {!priceLoading && totalPrice !== null && (
+                  <div className="mb-6">
+                    <div className="bg-green-50 border border-green-200 rounded-xl p-5 text-center mb-4">
+                      <p className="text-sm text-gray-500 mb-1">Total Amount Due</p>
+                      <p className="text-4xl font-bold text-green-600">
+                        {(totalPrice * euroToLek).toLocaleString()} Lek
+                      </p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        ({totalPrice.toFixed(2)} €)
+                      </p>
+                    </div>
+                    <p className="text-sm text-gray-500 text-center">
+                      This will mark all pending sessions as <span className="font-semibold text-green-600">Paid</span>.
+                    </p>
+                  </div>
+                )}
+
+                {/* Pay error */}
+                {payError && (
+                  <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-3">
+                    <p className="text-red-600 text-sm">{payError}</p>
+                  </div>
+                )}
+
+                {/* Footer buttons */}
+                {!priceLoading && (
+                  <div className="flex justify-end gap-2 mt-2">
+                    <Button variant="outline" onClick={handleClosePayModal} disabled={payLoading}>
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handlePay}
+                      disabled={payLoading || totalPrice === null || !!priceError}
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      {payLoading ? (
+                        <span className="flex items-center gap-2">
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          Processing...
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-2">
+                          <CreditCard className="w-4 h-4" /> Confirm Payment
+                        </span>
+                      )}
+                    </Button>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
