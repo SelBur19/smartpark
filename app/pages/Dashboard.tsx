@@ -83,11 +83,11 @@ const DashboardPage = () => {
   const renderUserContent = () => (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Button onClick={() => router.push("/dashboard/presentation/users")} className="bg-yellow-500 text-white hover:bg-yellow-600">
+        <Button onClick={() => router.push("/dashboard/presentation/sessions_users")} className="bg-yellow-500 text-white hover:bg-yellow-600">
           Session
         </Button>
 
-        <Button onClick={() => router.push("/dashboard/presentation/users")} className="bg-yellow-500 text-white hover:bg-yellow-600">
+        <Button onClick={() => router.push("/dashboard/presentation/cars_user")} className="bg-yellow-500 text-white hover:bg-yellow-600">
           Cars
         </Button>
       </div>
@@ -98,8 +98,10 @@ const DashboardPage = () => {
     <div>
       <h2 className="text-lg font-semibold mb-4">Owner</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Button onClick={() => router.push("/dashboard/presentation/users")} className="bg-yellow-500 text-white hover:bg-yellow-600">
+        <Button onClick={() => router.push("/dashboard/presentation/sessions_owner")} className="bg-yellow-500 text-white hover:bg-yellow-600">
           Session
+
+
         </Button>
 
         <Button onClick={() => router.push("/dashboard/presentation/parking_owner")} className="bg-yellow-500 text-white hover:bg-yellow-600">
@@ -110,11 +112,11 @@ const DashboardPage = () => {
       <div>
         <h2 className="text-lg font-semibold mb-4">User</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Button onClick={() => router.push("/dashboard/presentation/users")} className="bg-yellow-500 text-white hover:bg-yellow-600">
+          <Button onClick={() => router.push("/dashboard/presentation/sessions_users")} className="bg-yellow-500 text-white hover:bg-yellow-600">
             Session
           </Button>
 
-          <Button onClick={() => router.push("/dashboard/presentation/users")} className="bg-yellow-500 text-white hover:bg-yellow-600">
+          <Button onClick={() => router.push("/dashboard/presentation/cars_user")} className="bg-yellow-500 text-white hover:bg-yellow-600">
             Cars
           </Button>
         </div>

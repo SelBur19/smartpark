@@ -25,7 +25,7 @@ export const useLogin = () => {
       //const token = (window as any).LOGIN_RESPONSE?.token ?? "";
       
 
-      setMessage("Login successful ✓");
+      setMessage("Login successful");
       setTimeout(() => router.push("/dashboard/presentation"), 1000);
     } else {
       setMessage(result.message);
