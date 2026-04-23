@@ -4,7 +4,8 @@ export class User {
     public email: string,
     public name?: string,
     public role?: string,
-    public token?: string
+    public token?: string,
+    public status?: string
   ) {}
 
 };

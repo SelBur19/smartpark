@@ -5,21 +5,27 @@ import { AuthResult } from "../domain/types/AuthResult";
 export class AuthApiRepository implements AuthRepository {
   async login(email: string, password: string): Promise<AuthResult> {
     try {
-      const formData = new FormData();
-      formData.append("email", email);
-      formData.append("password", password);
-
-      const response = await fetch(
-        "https://smartpark.htl-projekt.com/api_login.php",
-        { method: "POST", body: formData }
-      );
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
       const data = await response.json();
       console.log("LOGIN RESPONSE:", data);
 
       if (data.status === "success") {
-        const user = new User(data.id, data.email, data.name, data.role, data.token);
-        // Token is stored in useLogin, not domain
+        const user = new User(
+          data.id,
+          data.email,
+          data.name,
+          data.role,
+          data.token,
+          data.status
+        );
         return { status: "success", user };
       }
 
