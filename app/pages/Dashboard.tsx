@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { User as UserIcon, BarChart3, Users, Building, Car } from "lucide-react";
 import { useDashboard } from "@/dashboard/presentation/useDashboard";
-import { User } from "@/dashboard/domain/entities/User";
+import { User } from "@/features/auth/domain/entities/User";
 
 const DashboardPage = () => {
   const [user, setUser] = useState<User | null>(null);
