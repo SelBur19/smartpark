@@ -122,7 +122,7 @@ export default function SessionsAdminPage() {
                     key={index}
                     className="border-b hover:bg-yellow-500/5"
                   >
-                    <td className="py-2">{session.plate_Number}</td>
+                    <td className="py-2 font-semibold text-gray-900 dark:text-white">{session.plate_Number}</td>
                     <td className="py-2">{session.parkPlaceID}</td>
                     <td className="py-2">{session.entryTime}</td>
                     <td className="py-2">{session.exitTime}</td>

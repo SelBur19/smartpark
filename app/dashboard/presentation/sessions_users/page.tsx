@@ -347,7 +347,7 @@ export default function SessionsUsersPage() {
                         key={idx}
                         className="border-b hover:bg-yellow-500/5 transition-colors duration-150"
                       >
-                        <td className="py-4 px-3 font-medium text-gray-900">{session.plate_Number}</td>
+                        <td className="py-4 px-3 font-semibold text-gray-900 dark:text-white">{session.plate_Number}</td>
                         <td className="py-4 px-3 text-gray-700">
                           <Badge variant="outline">#{session.parkPlaceID}</Badge>
                         </td>
