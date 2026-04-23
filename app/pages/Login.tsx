@@ -13,6 +13,7 @@ const LoginPage = () => {
     email,
     password,
     message,
+    loading,
     setEmail,
     setPassword,
     handleLogin,
@@ -35,6 +36,7 @@ const LoginPage = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              disabled={loading}
             />
 
             <Input
@@ -43,10 +45,11 @@ const LoginPage = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              disabled={loading}
             />
 
-            <Button type="submit" className="w-full bg-yellow-500">
-              Login
+            <Button type="submit" className="w-full bg-yellow-500" disabled={loading}>
+              {loading ? "Logging in..." : "Login"}
             </Button>
           </form>
 

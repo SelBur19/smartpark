@@ -50,7 +50,7 @@ const Navbar = () => {
 						<div className="flex gap-3">
 							{isLoggedIn ? (
 								<>
-									<Link href="/dashboard">
+									<Link href="/dashboard/presentation">
 										<Button className="bg-primary text-primary-foreground hover:bg-primary/90">
 											Dashboard
 										</Button>

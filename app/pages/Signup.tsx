@@ -13,7 +13,6 @@ const Signup = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
-  const [role, setRole] = useState<string>("User");
   const router = useRouter();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -24,15 +23,15 @@ const Signup = () => {
       return;
     }
 
-    // Build URL-encoded form data
+    // Always set role to "User"
     const formData = new URLSearchParams();
-    formData.append("name", fullname); // PHP expects 'name'
+    formData.append("name", fullname);
     formData.append("email", email);
     formData.append("password", password);
-    formData.append("role", role);
+    formData.append("role", "User");
 
     try {
-      const res = await fetch("http://smartpark.htl-projekt.com/api_addUser.php", {
+      const res = await fetch("https://smartpark.htl-projekt.com/api_addUser.php", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: formData.toString(),
@@ -46,8 +45,7 @@ const Signup = () => {
         setEmail("");
         setPassword("");
         setConfirmPassword("");
-        setRole("User");
-        router.push('/login');
+        router.push("/login");
       } else {
         alert("Registration failed: " + data.message);
       }
@@ -71,13 +69,19 @@ const Signup = () => {
               />
             </div>
           </div>
+
           <h1 className="text-3xl font-bold text-center mb-2">
             Create <span className="text-yellow-500">Account</span>
           </h1>
+
           <p className="text-foreground text-center mb-8">
-            Join us and start <span className="text-yellow-500 font-semibold">managing your parking</span> today
+            Join us and start{" "}
+            <span className="text-yellow-500 font-semibold">
+              managing your parking
+            </span>{" "}
+            today
           </p>
-          
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
@@ -87,11 +91,14 @@ const Signup = () => {
                 type="text"
                 placeholder="John Doe"
                 value={fullname}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => setFullname(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setFullname(e.target.value)
+                }
                 className="bg-secondary border-border text-foreground"
                 required
               />
             </div>
+
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
                 Email
@@ -100,11 +107,14 @@ const Signup = () => {
                 type="email"
                 placeholder="your.email@example.com"
                 value={email}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setEmail(e.target.value)
+                }
                 className="bg-secondary border-border text-foreground"
                 required
               />
             </div>
+
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
                 Password
@@ -113,11 +123,14 @@ const Signup = () => {
                 type="password"
                 placeholder="••••••••"
                 value={password}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setPassword(e.target.value)
+                }
                 className="bg-secondary border-border text-foreground"
                 required
               />
             </div>
+
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
                 Confirm Password
@@ -126,33 +139,28 @@ const Signup = () => {
                 type="password"
                 placeholder="••••••••"
                 value={confirmPassword}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                  setConfirmPassword(e.target.value)
+                }
                 className="bg-secondary border-border text-foreground"
                 required
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Register as
-              </label>
-              <select
-                value={role}
-                onChange={(e: ChangeEvent<HTMLSelectElement>) => setRole(e.target.value)}
-                className="w-full p-3 bg-secondary border border-border rounded-md text-foreground focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20 transition-all"
-              >
-                <option value="Admin">Admin</option>
-                <option value="User">User</option>
-                <option value="Owner">Owner</option>
-              </select>
-            </div>
-            <Button type="submit" className="w-full bg-yellow-500 text-white hover:bg-yellow-600 hover:shadow-lg hover:shadow-yellow-500/30 transition-all">
+
+            <Button
+              type="submit"
+              className="w-full bg-yellow-500 text-white hover:bg-yellow-600 hover:shadow-lg hover:shadow-yellow-500/30 transition-all"
+            >
               Create Account
             </Button>
           </form>
 
           <p className="text-center text-foreground mt-6">
             Already have an account?{" "}
-            <Link href="/login" className="text-yellow-500 hover:text-yellow-600 hover:underline font-semibold">
+            <Link
+              href="/login"
+              className="text-yellow-500 hover:text-yellow-600 hover:underline font-semibold"
+            >
               Login
             </Link>
           </p>

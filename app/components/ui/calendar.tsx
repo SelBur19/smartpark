@@ -41,10 +41,19 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
         day_hidden: "invisible",
         ...classNames,
       }}
-      components={{
-        IconLeft: ({ ..._props }) => <ChevronLeft className="h-4 w-4" />,
-        IconRight: ({ ..._props }) => <ChevronRight className="h-4 w-4" />,
-      }}
+      // `react-day-picker`'s built-in component types (`CustomComponents`) don't
+      // currently include `IconLeft`/`IconRight` even though the runtime
+      // implementation accepts them.  This mismatch causes a compile error when
+      // building the app (e.g. on Vercel).  We only care about the runtime
+      // behaviour, so cast the object to `any`/`unknown` to bypass the TypeScript
+      // check.  Alternatively we could augment the library types, but the cast is
+      // the least invasive fix.
+      components={
+        {
+          IconLeft: ({ ..._props }) => <ChevronLeft className="h-4 w-4" />,
+          IconRight: ({ ..._props }) => <ChevronRight className="h-4 w-4" />,
+        } as any
+      }
       {...props}
     />
   );

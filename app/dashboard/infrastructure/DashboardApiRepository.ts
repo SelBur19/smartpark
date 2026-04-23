@@ -20,3 +20,5 @@ export class DashboardApiRepository implements DashboardRepository {
     return { parkingSpots, bookings };
   }
 }
+
+
